@@ -210,4 +210,11 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $this->password_reset_token = null;
     }
+
+    /**
+     * returns username
+    */
+    public function getDisplayName(){
+        return $this->username;
+    }
 }

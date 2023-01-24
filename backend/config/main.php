@@ -37,14 +37,18 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
+        'assetManager'=>[
+            'bundles'=>[
+                \yii\bootstrap5\BootstrapAsset::class=>false
+            ]
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
             ],
         ],
-        */
+        
     ],
     'params' => $params,
 ];

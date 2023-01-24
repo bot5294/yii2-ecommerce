@@ -18,15 +18,16 @@ AppAsset::register($this);
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
-<body class="d-flex flex-column h-100">
+<body class="bg-gradient-primary">
 <?php $this->beginBody() ?>
-
-<main role="main">
     <div class="container">
-        <?= $content ?>
-    </div>
-</main>
 
+        <!-- Outer Row -->
+    <?= $content ?>
+
+    </div>
+
+</body>
 <?php $this->endBody() ?>
 </body>
 </html>
