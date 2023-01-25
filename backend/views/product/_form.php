@@ -12,7 +12,9 @@ use yii\bootstrap5\ActiveForm;
 
 <div class="product-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'options'=>['enctype'=>'multipart/form-data']
+    ]); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -22,7 +24,7 @@ use yii\bootstrap5\ActiveForm;
     ]) ?>
 
 
-    <?= $form->field($model, 'image')->fileInput() ?>
+    <?= $form->field($model, 'imageFile')->fileInput() ?>
 
     <?= $form->field($model, 'price')->textInput([
         'maxlength' => true,
