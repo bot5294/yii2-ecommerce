@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use common\models\Product;
 use backend\models\search\ProductSearch;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -73,13 +74,17 @@ class ProductController extends Controller
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
                 $model->imageFile = WebUploadedFile::getInstance($model, 'imageFile');
+                if(!$model->imageFile){
+                    $model->imageFile = true;
+                    $model->image=Yii::$app->params['frontendUrl'].'/img/No-Image-Placeholder.png';
+                }
                 if($model->imageFile && $model->save()){
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
-                echo '<pre>';
-                var_dump($model->imageFile);
-                echo '</pre>';
-                exit;
+                // echo '<pre>';
+                // var_dump($model->imageFile);
+                // echo '</pre>';
+                // exit;
             }
         } else {
             $model->loadDefaultValues();
@@ -101,8 +106,26 @@ class ProductController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        // if ($this->request->isPost && $model->load($this->request->post()) && $model->imageFile = WebUploadedFile::getInstance($model, 'imageFile') && $model->save()) {
+        //     return $this->redirect(['view', 'id' => $model->id]);
+        // }
+
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post())) {
+                $model->imageFile = WebUploadedFile::getInstance($model, 'imageFile');
+                // echo '<pre> at line 118 pc';
+                // print_r($model->imageFile);
+                // echo '</pre>';
+                // exit;
+                if($model->imageFile && $model->save()){
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+                // echo '<pre>';
+                // var_dump($model->imageFile);
+                // echo '</pre>';
+                // exit;
+            }
         }
 
         return $this->render('update', [

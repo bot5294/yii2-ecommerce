@@ -141,31 +141,48 @@ class Product extends \yii\db\ActiveRecord
     public function save($runValidation = true, $attributeNames = null)
     {
         try {
-            if($this->imageFile){
-                $this->image = '/products/' . Yii::$app->security->generateRandomString() . '/' . $this->imageFile->name;
+            if($this->imageFile && gettype($this->imageFile)!="boolean"){
+                echo '<pre>';
+                print_r("inside l 146");//gettype($this->imageFile) == "boolean");
+                echo '</pre>';
+                // exit;
+                // if($this->image != "http://yii2-ecommerce.localhost/img/No-Image-Placeholder.png"){
+                    $this->image = '/products/' . Yii::$app->security->generateRandomString() . '/' . $this->imageFile->name;
+                // }
             }
             $transaction = Yii::$app->db->beginTransaction();
             $ok = parent::save($runValidation, $attributeNames);
-            if ($ok) {
+            if ($ok && $this->image && gettype($this->imageFile)!="boolean") {
                 $fullPath = Yii::getAlias('@frontend/web/storage' . $this->image);
                 $dir = dirname($fullPath);
-                echo '<pre>';
-                var_dump($this->image);
-                echo '</pre>';
+                // echo '<pre>';
+                // var_dump($this->image);
+                // echo '\n fullpath ==>';
+                // var_dump($fullPath);
+                // echo '\n imageFile ==>';
+                // var_dump($this->imageFile);
+                // echo '</pre>';
                 if (!FileHelper::createDirectory($dir) | !$this->imageFile->saveAs($fullPath)) {
                     $transaction->rollBack();
                     return false;
                 }
-                $transaction->commit();
             }
+            $transaction->commit();
             return $ok;
         } catch (\Throwable $th) {
-            echo '<pre>';
+            echo '<pre> throwable msg line 169 product->save : ';
             print_r($th->getMessage());
             echo '</pre>';
         }
     }
     public function getImageUrl(){
+        // echo '<pre> inside getImageUrl ----> ';
+        // var_dump($this->image);
+        // echo '</pre>';
+        // exit;
+        if($this->image=="http://yii2-ecommerce.localhost/img/No-Image-Placeholder.png"){
+            return Yii::$app->params['frontendUrl'] . '/img/No-Image-Placeholder.png';        
+        }
         return Yii::$app->params['frontendUrl'] .'/storage'. $this->image;
     }
 }

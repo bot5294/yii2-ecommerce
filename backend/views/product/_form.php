@@ -23,8 +23,48 @@ use yii\bootstrap5\ActiveForm;
         'preset' => 'basic'
     ]) ?>
 
-
-    <?= $form->field($model, 'imageFile')->fileInput() ?>
+<!-- <div class="input-group mb-3">
+  <label class="input-group-text" for="inputGroupFile01">Upload</label>
+  <input type="file" class="form-control" id="inputGroupFile01">
+</div> -->
+<!-- <div class="input-group mb-3">
+  <input type="file" class="form-control" id="inputGroupFile02">
+  <label class="input-group-text" for="inputGroupFile02">Upload</label>
+</div> -->
+<?php if(!$model->image){ ?>
+    <?= $form->field($model, 'imageFile',[
+        'template' => '<div class="input-group mb-3">{input} {label} {error}</div>',
+        'labelOptions' => ['class'=>'input-group-text'],
+        'inputOptions' => ['class'=>'form-control']
+    ])->textInput(['type'=>'file',
+        'placeholder'=>'Upload Image'
+    ]) ?>
+    <?php }else{ 
+    //     echo '<pre> img url =>';
+    // var_dump(Html::encode($model->image));
+    //     echo '</pre>';
+    // exit;
+        ?>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-4"><img src="<?= $model->getImageUrl() ?>" width="250px" ></div>
+                <div class="col-8">
+                <?= $form->field($model, 'imageFile')->textInput([
+        'placeholder' => $model->image,
+        'disabled'=>true
+                ]) ?>
+                    <?= $form->field($model, 'imageFile',[
+        'template' => '<div class="input-group mb-3">{input} {label} {error}</div>',
+        // 'label'=>'Change Picture',
+        'labelOptions' => ['class'=>'input-group-text'],
+        'inputOptions' => ['class'=>'form-control']
+    ])->textInput(['type'=>'file',
+        'placeholder'=>'Upload Image'
+    ]) ?>
+                </div>
+            </div>
+        </div>
+    <?php } ?>
 
     <?= $form->field($model, 'price')->textInput([
         'maxlength' => true,
