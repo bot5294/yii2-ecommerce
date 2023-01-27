@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <?= GridView::widget([
+    <?= \yii\grid\GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -68,10 +68,11 @@ $this->params['breadcrumbs'][] = $this->title;
             //'created_by',
             //'updated_by',
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Product $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                // 'class' => ActionColumn::className(),
+                'class' => 'common\grid\ActionColumn',
+                // 'urlCreator' => function ($action, Product $model, $key, $index, $column) {
+                //     return Url::toRoute([$action, 'id' => $model->id]);
+                //  }
             ],
         ],
     ]); ?>
