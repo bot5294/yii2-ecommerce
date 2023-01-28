@@ -6,6 +6,7 @@ use Yii;
 use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\FileHelper;
+use yii\helpers\StringHelper;
 
 /**
  * This is the model class for table "{{%products}}".
@@ -184,5 +185,8 @@ class Product extends \yii\db\ActiveRecord
             return Yii::$app->params['frontendUrl'] . '/img/No-Image-Placeholder.png';        
         }
         return Yii::$app->params['frontendUrl'] .'/storage'. $this->image;
+    }
+    public function getShortDescription(){
+        return StringHelper::truncateWords(strip_tags($this->description), 30);
     }
 }
