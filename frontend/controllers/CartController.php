@@ -37,6 +37,7 @@ use yii\web\Response;
     {
         if(Yii::$app->user->isGuest){
             // Get the items from session
+            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY,[]);
         }else{
             // $cartItems = CartItem::find()->userId(Yii::$app->user->id)->all();
             $cartItems = CartItem::findBySql(
@@ -60,6 +61,35 @@ use yii\web\Response;
         }
         if(Yii::$app->user->isGuest){
             // Save in session
+            $cartItem = [
+                    'id' => $id,
+                    'name' => $product->name,
+                    'image' => $product->image,
+                    'price' => $product->price,
+                    'quantity' => 1,
+                    'total_price' => $product->price
+            ];
+            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY,[]);
+            $found = false;
+            foreach($cartItems as &$cartItem){
+                if($cartItem['id'] == $id){
+                    $cartItem['quantity']++;
+                    $found = true;
+                        break;
+                }
+            }
+            if(!$found){
+                $cartItem = [
+                    'id' => $id,
+                    'name' => $product->name,
+                    'image' => $product->image,
+                    'price' => $product->price,
+                    'quantity' => 1,
+                    'total_price' => $product->price
+                ];
+                $cartItems[] = $cartItem;
+            }
+                Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
         }else{
             $userId = Yii::$app->user->id;
             $cartItem = CartItem::find()->userId($userId)->productId($id)->one();
@@ -93,4 +123,10 @@ use yii\web\Response;
 
     }
 
+
+    public function actionDelete($id){
+        if(isGuest()){
+            $cartItem = Yii::$app->session->get(CartItem::SESSION_KEY, []);
+        }
+    }
  }
