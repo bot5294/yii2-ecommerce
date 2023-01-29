@@ -181,11 +181,17 @@ class Product extends \yii\db\ActiveRecord
         // var_dump($this->image);
         // echo '</pre>';
         // exit;
-        if($this->image=="http://yii2-ecommerce.localhost/img/No-Image-Placeholder.png"){
+        return self::formatImageUrl($this->image);
+    }
+
+    public static function formatImageUrl($imagePath){
+        if($imagePath=="http://yii2-ecommerce.localhost/img/No-Image-Placeholder.png"){
             return Yii::$app->params['frontendUrl'] . '/img/No-Image-Placeholder.png';        
         }
-        return Yii::$app->params['frontendUrl'] .'/storage'. $this->image;
+        return Yii::$app->params['frontendUrl'] .'/storage'. $imagePath;
     }
+
+
     public function getShortDescription(){
         return StringHelper::truncateWords(strip_tags($this->description), 30);
     }

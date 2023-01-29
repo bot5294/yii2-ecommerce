@@ -7,6 +7,7 @@
  */
 
 use yii\helpers\StringHelper;
+use yii\helpers\Url;
 
  /** @var \common\models\Product $model */
  ?>
@@ -30,7 +31,7 @@ use yii\helpers\StringHelper;
         </div>
         <!-- Product actions-->
         <div class="card-footer text-end">
-            <a class="btn btn-outline-success mt-auto" href="#">Add to cart</a>
+            <a class="btn btn-outline-success btn-add-to-cart mt-auto" href="<?php echo Url::to(['/cart/add']) ?>">Add to cart</a>
         </div>
     </div>
 <!-- </div> -->

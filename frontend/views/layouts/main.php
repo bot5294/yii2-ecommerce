@@ -10,6 +10,8 @@ use yii\bootstrap5\Html;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 
+$cartItemCount = $this->params['cartItemCount'];
+
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
@@ -70,7 +72,7 @@ AppAsset::register($this);
     ]);
     $menuItems = [
         [
-            'label' => 'Cart <span id="cart-quantity" class="badge badge-danger">' . '</span>',
+            'label' => 'Cart <span id="cart-quantity" class="badge badge-danger">' .$cartItemCount. '</span>',
             'url' => ['/cart/index'],
             'encode' => false
         ],
