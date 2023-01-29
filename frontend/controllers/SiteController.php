@@ -13,6 +13,8 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\LoginForm;
 use common\models\Product;
+use common\models\UserAddress;
+use common\models\User;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
@@ -21,7 +23,7 @@ use frontend\models\ContactForm;
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends \frontend\base\Controller
 {
     /**
      * {@inheritdoc}
@@ -78,11 +80,11 @@ class SiteController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query'=>Product::find()->published(),
+            'query' => Product::find()->published(),
 
         ]);
-        return $this->render('index',[
-            'dataProvider'=>$dataProvider
+        return $this->render('index', [
+            'dataProvider' => $dataProvider
         ]);
     }
 
