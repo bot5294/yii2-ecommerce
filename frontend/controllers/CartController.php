@@ -10,6 +10,7 @@ use common\models\Product;
 use Yii;
 use yii\base\Behavior;
 use yii\filters\ContentNegotiator;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -29,6 +30,12 @@ use yii\web\Response;
                 'only' => ['add'],
                 'formats' => [
                     'application/json' => Response::FORMAT_JSON,
+                ]
+            ],
+            [
+                'class'=>VerbFilter::class,
+                'actions'=>[
+                    'delete'=>['POST','DELETE'],
                 ]
             ]
         ];
@@ -126,7 +133,17 @@ use yii\web\Response;
 
     public function actionDelete($id){
         if(isGuest()){
-            $cartItem = Yii::$app->session->get(CartItem::SESSION_KEY, []);
+            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
+            foreach($cartItems as $i => $cartItem){
+                if ($cartItem['id'] == $id) {
+                    array_splice($cartItems, $i, 1);
+                    break;
+                }
+            }
+            Yii::$app->session->set(CartItem::SESSION_KEY, $cartItems);
+        }else{
+            CartItem::deleteAll(['product_id' => $id, 'created_by' => currUserId()]);
         }
+        return $this->redirect(['index']);
     }
  }
