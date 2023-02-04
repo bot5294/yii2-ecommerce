@@ -6,6 +6,8 @@
 namespace frontend\controllers;
 
 use common\models\CartItem;
+use common\models\Order;
+use common\models\OrderAddress;
 use common\models\Product;
 use Yii;
 use yii\base\Behavior;
@@ -48,16 +50,7 @@ use yii\web\Response;
     }
     public function actionIndex()
     {
-        if(Yii::$app->user->isGuest){
-            // Get the items from session
-            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY,[]);
-        }else{
-            // $cartItems = CartItem::find()->userId(Yii::$app->user->id)->all();
-            $cartItems = CartItem::findBySql(
-                "SELECT c.product_id as id,p.image,p.name,p.price,c.quantity,p.price*c.quantity as total_price FROM cart_items c LEFT JOIN products p on p.id = c.product_id WHERE c.created_by = :userId",
-                ['userId' => Yii::$app->user->id]
-            )->asArray()->all();
-        }
+        $cartItems = (Yii::$app->user->isGuest) ? Yii::$app->session->get(CartItem::SESSION_KEY,[]) : CartItem::getItemsForUser(currUserId());
 
         return $this->render('index', [
             'items' => $cartItems
@@ -176,5 +169,36 @@ use yii\web\Response;
             }
         }
         return CartItem::getTotalQuantityForUser(currUserId());
+    }
+    public function actionCheckout(){
+        $order = new Order();
+        $orderAddress = new OrderAddress();
+        if(!isGuest()){
+            /** @var \common\models\User $user */
+            $user = Yii::$app->user->identity;
+            $userAddress = $user->getAddress();
+            $order->firstname = $user->firstname;
+            $order->lastname = $user->lastname;
+            $order->email = $user->email;
+            $order->status = Order::STATUS_DRAFT;
+
+            $orderAddress->address = $userAddress->address;
+            $orderAddress->city = $userAddress->city;
+            $orderAddress->state = $userAddress->state;
+            $orderAddress->country = $userAddress->country;
+            $orderAddress->zipcode = $userAddress->zipcode;
+            $cartItems = CartItem::getItemsForUser(currUserId());
+        }else{
+            $cartItems = Yii::$app->session->get(CartItem::SESSION_KEY, []);
+        }
+        $productQuantity = CartItem::getTotalQuantityForUser(currUserId());
+        $totalPrice = CartItem::getTotalPriceForUser(currUserId());
+        return $this->render('checkout', [
+            'order' => $order,
+            'orderAddress' => $orderAddress,
+            'cartItems'=>$cartItems,
+            'productQuantity'=>$productQuantity,
+            'totalPrice'=>$totalPrice
+        ]);
     }
  }
