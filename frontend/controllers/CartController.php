@@ -8,11 +8,14 @@ namespace frontend\controllers;
 use common\models\CartItem;
 use common\models\Order;
 use common\models\OrderAddress;
+use common\models\OrderItem;
 use common\models\Product;
 use Yii;
 use yii\base\Behavior;
 use yii\filters\ContentNegotiator;
 use yii\filters\VerbFilter;
+use yii\helpers\VarDumper;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -44,6 +47,7 @@ use yii\web\Response;
                 'class'=>VerbFilter::class,
                 'actions'=>[
                     'change-quantity'=>['POST'],
+                    'submit-payment'=>['POST']
                 ],
             ]
         ];
@@ -173,6 +177,7 @@ use yii\web\Response;
     public function actionCheckout(){
         $order = new Order();
         $orderAddress = new OrderAddress();
+        $orderItem = new OrderItem();
         if(!isGuest()){
             /** @var \common\models\User $user */
             $user = Yii::$app->user->identity;
@@ -198,7 +203,81 @@ use yii\web\Response;
             'orderAddress' => $orderAddress,
             'cartItems'=>$cartItems,
             'productQuantity'=>$productQuantity,
-            'totalPrice'=>$totalPrice
+            'totalPrice'=>$totalPrice,
+            'orderItem'=>$orderItem
         ]);
+    }
+
+    public function actionSubmitPayment(){
+        $isCompleted = true;
+        $order = new Order();
+        $orderAddress = new OrderAddress();
+        $orderItem = new OrderItem();
+
+        $data = Yii::$app->request->post();
+        $otemp = $data['Order'];
+        $oatemp = $data['OrderAddress'];
+        $oitemp = $data['OrderItem'];
+
+        $order["total_price"]= $otemp["total_price"];
+        $order["created_by"] = $otemp["created_by"];
+        $order["created_at"] = $otemp["created_at"];
+        $order["firstname"] = $otemp["firstname"];
+        $order['transaction_id'] = 't-' . time() . rand(1000, 100000);
+        $order['status'] = "1";
+        $order["lastname"] = $otemp["lastname"];
+        $order["email"] = $otemp["email"];
+
+        // saving order details to db
+        if(!$order->save()){
+            echo '<pre>';
+            echo "order not saved";
+            print_r($order->getErrors());
+            echo '</pre>';
+            $isCompleted = false;
+            exit;
+        }
+
+        $orderAddress['address'] = $oatemp['address'];
+        $orderAddress['city'] = $oatemp['city'];
+        $orderAddress['country'] = $oatemp['country'];
+        $orderAddress['state'] = $oatemp['state'];
+        $orderAddress['zipcode'] = $oatemp['zipcode'];
+        $orderAddress['order_id'] = $order->id;
+
+        // saving order address details to db
+        if(!$orderAddress->save()){
+            echo '<pre>';
+            echo "address not saved";
+            print_r($orderAddress->getErrors());
+            echo '</pre>';
+            $isCompleted = false;
+            exit;
+        }
+
+        for($i = 0; $i < count($oitemp['product_id']);$i++){
+            $orderItem['product_name'] = $oitemp['product_name'][$i];
+            $orderItem['product_id'] = $oitemp['product_id'][$i];
+            $orderItem['unit_price'] = $oitemp['unit_price'][$i];
+            $orderItem['quantity'] = $oitemp['quantity'][$i];
+            $orderItem['order_id'] = $order->id;
+            if(!$orderItem->save()){
+                echo '<pre>';
+                print_r($orderItem->getErrors());
+                echo "Error !!! Order Item not saved !!";
+                echo '</pre>';
+                $isCompleted = false;
+                exit;
+            }
+        }
+        if($isCompleted){
+            // $order->sendEmailToVendor();
+            return [
+                'success' => true
+            ];
+        }else{
+            Yii:error("Order was not saved. Data: " . VarDumper::dumpAsString($order->toArray() . '.Errors.' . VarDumper::dumpAsString($order->errors)));
+        }
+        // Yii::$app->
     }
  }

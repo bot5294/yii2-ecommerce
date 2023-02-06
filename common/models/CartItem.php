@@ -61,7 +61,7 @@ class CartItem extends \yii\db\ActiveRecord
             "SELECT c.product_id as id,p.image,p.name,p.price,c.quantity,p.price*c.quantity as total_price FROM cart_items c LEFT JOIN products p on p.id = c.product_id WHERE c.created_by = :userId",
             ['userId' => $currUserId]
         )->asArray()->all();
-    } 
+    }
     /**
      * {@inheritdoc}
      */

@@ -39,8 +39,8 @@ class Order extends \yii\db\ActiveRecord
     {
         return [
             [['total_price', 'status', 'firstname', 'lastname', 'email'], 'required'],
-            [['total_price'], 'number'],
-            [['status', 'created_at', 'created_by'], 'integer'],
+            [['total_price'], 'string'],
+            [['status', 'created_at', 'created_by'], 'string'],
             [['firstname', 'lastname'], 'string', 'max' => 45],
             [['email', 'transaction_id'], 'string', 'max' => 255],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['created_by' => 'id']],
@@ -103,4 +103,5 @@ class Order extends \yii\db\ActiveRecord
     {
         return new \common\models\query\OrderQuery(get_called_class());
     }
+
 }

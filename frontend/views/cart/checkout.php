@@ -1,15 +1,18 @@
 <?php
 use yii\bootstrap5\ActiveForm;
+use yii\helpers\Url;
+
 /** User: bot5294 */
 /** @var \common\models\Order $order */
 /** @var \common\models\OrderAddress $orderAddress */
+/** @var \common\models\OrderItem $order_items */
 /** @var array $cartItems */
 /** @var int $productQuantity */
 /** @var float $totalPrice */
 ?>
 
 <?php $form = ActiveForm::begin([
-        'action' => [''],
+        'action' => ['submit-payment'],
     ]); ?>
 
 <div class="row">
@@ -33,7 +36,37 @@ use yii\bootstrap5\ActiveForm;
                 </table>
             </div>
         </div>
+        <!-- PayPal btn start -->
+        <?= $form->field($order,"total_price")->hiddenInput([
+            'value'=>$totalPrice
+        ])->label(false) ?>
+        <?= $form->field($order,"created_at")->hiddenInput([
+            'value'=>time()
+        ])->label(false) ?>
+        <?= $form->field($order,"created_by")->hiddenInput([
+            'value'=>Yii::$app->user->getId()
+        ])->label(false) ?>
         <button class="btn btn-secondary float-end mt-2 mb-2">Checkout</button>
+        <!-- PayPal btn end -->
+
+<!-- cart items -->
+<?php foreach ($cartItems as $index => $item): ?>
+        <?= $form->field($orderItem,"product_name[".$index."]")->hiddenInput([
+            'value'=>$item["name"]
+        ])->label(false) ?>
+        <?= $form->field($orderItem,"product_id[".$index."]")->hiddenInput([
+            'value'=>$item["id"]
+        ])->label(false) ?>
+        <?= $form->field($orderItem,"unit_price[".$index."]")->hiddenInput([
+            'value'=>$item["price"]
+        ])->label(false) ?>
+        <?= $form->field($orderItem,"quantity[".$index."]")->hiddenInput([
+            'value'=>$item["quantity"]
+        ])->label(false) ?>
+        <?php endforeach; ?>
+
+<!-- cart items -->
+
     </div>
 </div>
 

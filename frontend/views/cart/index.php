@@ -8,6 +8,13 @@ use common\models\Product;
 use yii\helpers\Html;
 use yii\helpers\Url;
 ?>
+
+<?php if(isset($order_placed) && $order_placed) : ?>
+<div class="alert alert-success">
+    Your Order Placed successfully !!
+</div>
+<?php endif ?>
+
 <div class="card">
     <div class="card-header">
         <h3>Your Cart Items</h3>
