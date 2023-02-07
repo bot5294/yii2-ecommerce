@@ -18,8 +18,8 @@ use Yii;
  * @property int|null $created_by
  *
  * @property User $createdBy
- * @property OrderAddresses $orderAddresses
- * @property OrderItems[] $orderItems
+ * @property OrderAddress $orderAddress
+ * @property OrderItem[] $orderItems
  */
 class Order extends \yii\db\ActiveRecord
 {
@@ -78,21 +78,27 @@ class Order extends \yii\db\ActiveRecord
     /**
      * Gets query for [[OrderAddresses]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\OrderAddressesQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\OrderAddressQuery
      */
     public function getOrderAddresses()
     {
-        return $this->hasOne(OrderAddresses::class, ['order_id' => 'id']);
+        // $temp = $this->hasOne(OrderAddress::class, ['order_id' => 'id']);
+        return $temp = OrderAddress::getOrderAddress($this->id);
+        // echo '<pre>';
+        // var_dump($temp);
+        // echo '</pre>';
+        // exit;
+        // return; 
     }
 
     /**
      * Gets query for [[OrderItems]].
      *
-     * @return \yii\db\ActiveQuery|\common\models\query\OrderItemsQuery
+     * @return \yii\db\ActiveQuery|\common\models\query\OrderItemQuery
      */
     public function getOrderItems()
     {
-        return $this->hasMany(OrderItems::class, ['order_id' => 'id']);
+        return $this->hasMany(OrderItem::class, ['order_id' => 'id']);
     }
 
     /**
@@ -104,4 +110,39 @@ class Order extends \yii\db\ActiveRecord
         return new \common\models\query\OrderQuery(get_called_class());
     }
 
+
+    public function getItemsQuantity()
+    {
+        return $sum = CartItem::findBySql(
+            "SELECT SUM(quantity) FROM order_items WHERE order_id = :orderId", ['orderId' => $this->id]
+        )->scalar();
+    }
+
+
+    public function sendEmailToVendor(){
+        // $this->orderAddress = 
+        return Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'order_completed_vendor-html', 'text' => 'order_completed_vendor-text'],
+                ['order' => $this]
+            )
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+            ->setTo(Yii::$app->params['vendorEmail'])
+            ->setSubject('Recevied New Order at  ' . Yii::$app->name)
+            ->send();
+    }
+
+    public function sendEmailToCustomer(){
+        return Yii::$app
+            ->mailer
+            ->compose(
+                ['html' => 'order_completed_customer-html', 'text' => 'order_completed_customer-text'],
+                ['order' => $this]
+            )
+            ->setFrom([Yii::$app->params['supportEmail'] => Yii::$app->name . ' robot'])
+            ->setTo($this->email)
+            ->setSubject('Your order is confirmed at  ' . Yii::$app->name)
+            ->send();
+    }
 }

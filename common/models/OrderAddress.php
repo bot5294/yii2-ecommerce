@@ -73,4 +73,7 @@ class OrderAddress extends \yii\db\ActiveRecord
     {
         return new \common\models\query\OrderAddressQuery(get_called_class());
     }
+    public static function getOrderAddress($id){
+        return OrderAddress::findOne($id);
+    }
 }
